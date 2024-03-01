@@ -15,6 +15,8 @@ use spl_transfer_hook_interface::instruction::{ExecuteInstruction, TransferHookI
 
 declare_id!("EBZDYx7599krFc4m2govwBdZcicr4GgepqC78m71nsHS");
 
+const AMOUNT_TOO_BIG_THRESHOLD: u64 = 1_000_000_000_000u64; // 1000 token (decimals=9)
+
 #[error_code]
 pub enum MyError {
     #[msg("The amount is too big")]
@@ -79,9 +81,9 @@ pub mod transfer_hook_counter {
 
     pub fn transfer_hook(ctx: Context<TransferHook>, amount: u64) -> Result<()> {
 
-        if amount > 50 /* note: u64 amount */ {
+        if amount > AMOUNT_TOO_BIG_THRESHOLD /* note: u64 amount */ {
             msg!("The amount is too big {0}", amount);
-        //    return err!(MyError::AmountTooBig);
+            return err!(MyError::AmountTooBig);
         }
 
         ctx.accounts.counter_account.counter += 1;

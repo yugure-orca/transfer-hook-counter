@@ -253,4 +253,39 @@ describe("transfer-hook-counter", () => {
       + post1DestinationBalance.value.uiAmountString + " -> "
       + post2DestinationBalance.value.uiAmountString);    
   });
+
+  it("Fail: AmountTooBig", async () => {
+    // 1001 tokens (> 1000)
+    const amount = 1001 * 10 ** decimals;
+    const amountBigInt = BigInt(amount);
+
+    let transferInstructionWithHelper = await createTransferCheckedWithTransferHookInstruction( 
+      connection,
+      sourceTokenAccount,
+      mint.publicKey,
+      destinationTokenAccount,
+      wallet.publicKey,
+      amountBigInt,
+      decimals,
+      [],
+      "confirmed",
+      TOKEN_2022_PROGRAM_ID,
+    );
+    
+    const transaction = new Transaction().add(
+      transferInstructionWithHelper
+    );
+
+    try {
+      const txSig = await sendAndConfirmTransaction(
+        connection,
+        transaction,
+        [wallet.payer],
+        { skipPreflight: true, commitment: "confirmed" }
+      );
+    } catch (e) {
+      const msg = e.toString();
+      console.log("Transaction failed:", msg);
+    }
+  });
 });
