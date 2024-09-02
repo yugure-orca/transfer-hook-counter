@@ -32,6 +32,8 @@ pub mod transfer_hook_counter {
     ) -> Result<()> {
 
         // The `addExtraAccountsToInstruction` JS helper function resolving incorrectly
+        // index 0-3 are the accounts required for token transfer (source, mint, destination, owner)
+        // index 4 is address of ExtraAccountMetaList account
         let account_metas = vec![
             ExtraAccountMeta::new_with_seeds(
                 &[
@@ -40,6 +42,18 @@ pub mod transfer_hook_counter {
                 ],
                 false, // is_signer
                 true,  // is_writable
+            )?,
+            ExtraAccountMeta::new_with_seeds(
+                // This PDA is empty, but used to verify account order
+                &[
+                    Seed::Literal {bytes: "verify".as_bytes().to_vec()},
+                    Seed::AccountKey { index: 0 }, // source
+                    Seed::AccountKey { index: 1 }, // mint
+                    Seed::AccountKey { index: 2 }, // destination
+                    Seed::AccountKey { index: 3 }, // owner
+                ],
+                false, // is_signer
+                false, // is_writable
             )?,
         ];
 
@@ -171,6 +185,15 @@ pub struct TransferHook<'info> {
         bump
     )]
     pub counter_account: Account<'info, CounterAccount>,
+    /// CHECK: seeds constraint
+    #[account(seeds = [
+        b"verify",
+        source_token.key().as_ref(),
+        mint.key().as_ref(),
+        destination_token.key().as_ref(),
+        owner.key().as_ref(),
+    ], bump)]
+    pub account_order_verifier: UncheckedAccount<'info>,
 }
 
 #[account]

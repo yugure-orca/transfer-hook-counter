@@ -202,8 +202,21 @@ describe("transfer-hook-counter", () => {
     );
 
     console.log("Extra accounts meta: " + extraAccountMetaListPDA);
-    console.log("Counter PDa: " + counterPDA);
+    console.log("Counter PDA: " + counterPDA);
     console.log("Transfer Instruction: " + JSON.stringify(transferInstructionWithHelper));
+
+    // 8 accounts
+    // 0) source
+    // 1) mint
+    // 2) destination
+    // 3) owner
+    // 4) counter PDA
+    // 5) verify PDA
+    // 6) transfer hook program id
+    // 7) extra accounts meta
+    for (const p of transferInstructionWithHelper.keys) {
+      console.log("Key: " + p.pubkey.toBase58());
+    }
     
     const transaction1 = new Transaction().add(
       transferInstructionWithHelper
