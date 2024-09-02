@@ -75,6 +75,11 @@
           "name": "counterAccount",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "accountOrderVerifier",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
